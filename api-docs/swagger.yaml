@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  title: QuickBite API
+  description: |
+    # QuickBite Food Ordering Platform API
+    
+    Welcome to the QuickBite API documentation. This API allows you to:
+    - Manage food orders
+    - Browse restaurants and menus
+    - Process payments
+    - Track deliveries
+    
+    ## Authentication
+    Most endpoints require authentication using JWT tokens.
+    
+    ## Rate Limiting
+    - 100 requests/minute for authenticated users
+    - 20 requests/minute for guests
+    
+    ## Support
+    - Email: api-support@quickbite.com
+    - Documentation: https://docs.quickbite.com
+    
+  version: 1.0.0
+  contact:
+    name: QuickBite API Support
+    email: api-support@quickbite.com
+    url: https://quickbite.com/support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://api.quickbite.com/v1
+    description: Production server
+  - url: https://staging-api.quickbite.com/v1
+    description: Staging server
+  - url: http://localhost:5000/api/v1
+    description: Local development
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Users
+    description: User management
+  - name: Restaurants
+    description: Restaurant operations
+  - name: Orders
+    description: Order management
+  - name: Payments
+    description: Payment processing
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+        '429':
+          description: Too many requests
+
+  /restaurants:
+    get:
+      tags:
+        - Restaurants
+      summary: List restaurants
+      description: Get a list of available restaurants
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: cuisine
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+
+  /orders:
+    post:
+      tags:
+        - Orders
+      summary: Create new order
+      description: Create a new food order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid order data
+        '401':
+          description: Unauthorized
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: securepassword123
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [customer, restaurant_owner, admin, delivery_person]
+
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        cuisine:
+          type: array
+          items:
+            type: string
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+        deliveryTime:
+          type: integer
+          description: Estimated delivery time in minutes
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - restaurantId
+        - items
+        - deliveryAddress
+      properties:
+        restaurantId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        deliveryAddress:
+          $ref: '#/components/schemas/Address'
+        specialInstructions:
+          type: string
+
+    OrderItem:
+      type: object
+      required:
+        - menuItemId
+        - quantity
+      properties:
+        menuItemId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        customizations:
+          type: array
+          items:
+            type: string
+
+    Address:
+      type: object
+      required:
+        - street
+        - city
+        - zipCode
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipCode:
+          type: string
+        country:
+          type: string
+          default: "USA"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key

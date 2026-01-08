@@ -1,0 +1,12 @@
+apis:
+  quickbite@v1:
+    root: ./swagger.yaml
+extends:
+  - recommended
+rules:
+  no-unused-components: error
+  no-undefined-server-variable: error
+  no-server-trailing-slash: error
+  operation-2xx-response: warn
+  operation-4xx-response: warn
+  tag-description: warn

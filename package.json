@@ -1,0 +1,50 @@
+{
+  "name": "quickbite",
+  "version": "1.0.0",
+  "description": "A fast, efficient solution for quick food ordering",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build": "webpack --mode production",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "quickbite",
+    "food",
+    "ordering",
+    "fast"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FAZZIOMOREIRA/QuickBite"
+  },
+  "bugs": {
+    "url": "https://github.com/FAZZIOMOREIRA/QuickBite"
+  },
+  "homepage": "https://github.com/FAZZIOMOREIRA/QuickBite",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "lint-staged": "^13.2.1",
+    "nodemon": "^3.1.11",
+    "prettier": "^2.8.7"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
